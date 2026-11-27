@@ -5,7 +5,7 @@ from OpenGL.GL import (
     glGetProgramiv, glGetProgramInfoLog, glDeleteShader, glUseProgram,
     GL_VERTEX_SHADER, GL_FRAGMENT_SHADER, GL_COMPILE_STATUS, GL_LINK_STATUS,
     glGetUniformLocation, glUniformMatrix4fv, glUniform3f, glUniform1f,
-    glUniform1i, GL_FALSE,
+    glUniform1i, glUniform2f, GL_FALSE,
 )
 import numpy as np
 
@@ -48,6 +48,9 @@ class Shader:
 
     def set_vec3(self, name, v):
         glUniform3f(self._loc(name), float(v[0]), float(v[1]), float(v[2]))
+
+    def set_vec2(self, name, v):
+        glUniform2f(self._loc(name), float(v[0]), float(v[1]))
 
     def set_float(self, name, v):
         glUniform1f(self._loc(name), float(v))

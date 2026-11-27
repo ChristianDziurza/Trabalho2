@@ -60,11 +60,12 @@ uniform vec3 uEmissive;
 uniform float uAlpha;
 uniform sampler2D uTex;
 uniform int uUseTexture;
+uniform vec2 uTexScale;
 out vec4 fragColor;
 void main() {
     vec3 baseColor = uTint;
     if (uUseTexture == 1) {
-        baseColor *= texture(uTex, vUV).rgb;
+        baseColor *= texture(uTex, vUV * uTexScale).rgb;
     }
     vec3 N = normalize(vNormal);
     vec3 lighting = uAmbient;
@@ -128,11 +129,12 @@ class Renderer:
         glViewport(0, 0, w, h)
         self.camera.aspect = w / max(1, h)
 
-    def _draw(self, mesh, model, tint=(1,1,1), emissive=(0,0,0), texture_name=None, alpha=1.0):
+    def _draw(self, mesh, model, tint=(1,1,1), emissive=(0,0,0), texture_name=None, alpha=1.0, tex_scale=(1.0, 1.0)):
         self.shader.set_mat4("uModel", model.T)
         self.shader.set_vec3("uTint", tint)
         self.shader.set_vec3("uEmissive", emissive)
         self.shader.set_float("uAlpha", alpha)
+        self.shader.set_vec2("uTexScale", tex_scale)
         if texture_name:
             self.shader.set_int("uUseTexture", 1)
             self.shader.set_int("uTex", 0)
@@ -170,7 +172,7 @@ class Renderer:
         self.upload_lights(state)
         
         ground = translation(0, -0.05, 0) @ scale_m(50, 1, 50)
-        self._draw(self.mesh_plane, ground, tint=(0.3,0.25,0.2), texture_name="dirt")
+        self._draw(self.mesh_plane, ground, tint=(0.3,0.25,0.2), texture_name="dirt", tex_scale=(25, 25))
         
         self._draw_skybox(state)
         self._draw_walls(state)
@@ -183,7 +185,7 @@ class Renderer:
         m = translation(0, 15, 0) @ scale_m(size, size, size)
         glEnable(GL_CULL_FACE)
         glFrontFace(GL_CW)
-        self._draw(self.mesh_cube, m, tint=(0.1,0.1,0.15), texture_name="rock")
+        self._draw(self.mesh_cube, m, tint=(0.1,0.1,0.15), texture_name="rock", tex_scale=(10, 10))
         glFrontFace(GL_CCW)
         glDisable(GL_CULL_FACE)
 
@@ -206,7 +208,9 @@ class Renderer:
             (ex, 0, 0.6, ez*2),
         ]:
             m = translation(px, h/2, pz) @ scale_m(sxx, h, szz)
-            self._draw(self.mesh_cube, m, tint=(0.3,0.28,0.25), texture_name="rock")
+            escala_u = max(sxx, szz) * 0.5
+            escala_v = h * 0.5
+            self._draw(self.mesh_cube, m, tint=(0.3,0.28,0.25), texture_name="rock", tex_scale=(escala_u, escala_v))
 
         for (px, pz) in [(-ex+1.5, -ez+2), (ex-2, ez-1.5), (-ex+2, ez-1.5)]:
             m = translation(px, 0.5, pz) @ scale_m(1.0, 1.0, 1.0)

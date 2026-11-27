@@ -38,16 +38,24 @@ def make_cube(size=1.0):
     s = size / 2.0
     vs, ns, ts = [], [], []
     faces = [
-        ((0,0,1), [(-s,-s,s),(s,-s,s),(s,s,s),(-s,-s,s),(s,s,s),(-s,s,s)]),
-        ((0,0,-1),[(-s,-s,-s),(-s,s,-s),(s,s,-s),(-s,-s,-s),(s,s,-s),(s,-s,-s)]),
-        ((1,0,0), [(s,-s,-s),(s,s,-s),(s,s,s),(s,-s,-s),(s,s,s),(s,-s,s)]),
-        ((-1,0,0),[(-s,-s,-s),(-s,-s,s),(-s,s,s),(-s,-s,-s),(-s,s,s),(-s,s,-s)]),
-        ((0,1,0), [(-s,s,-s),(-s,s,s),(s,s,s),(-s,s,-s),(s,s,s),(s,s,-s)]),
-        ((0,-1,0),[(-s,-s,-s),(s,-s,-s),(s,-s,s),(-s,-s,-s),(s,-s,s),(-s,-s,s)]),
+        # Frente (+Z)
+        ((0,0,1),  [(-s,-s, s, 0,0), ( s,-s, s, 1,0), ( s, s, s, 1,1), (-s,-s, s, 0,0), ( s, s, s, 1,1), (-s, s, s, 0,1)]),
+        # Trás (-Z)
+        ((0,0,-1), [( s,-s,-s, 0,0), (-s,-s,-s, 1,0), (-s, s,-s, 1,1), ( s,-s,-s, 0,0), (-s, s,-s, 1,1), ( s, s,-s, 0,1)]),
+        # Direita (+X)
+        ((1,0,0),  [( s,-s, s, 0,0), ( s,-s,-s, 1,0), ( s, s,-s, 1,1), ( s,-s, s, 0,0), ( s, s,-s, 1,1), ( s, s, s, 0,1)]),
+        # Esquerda (-X)
+        ((-1,0,0), [(-s,-s,-s, 0,0), (-s,-s, s, 1,0), (-s, s, s, 1,1), (-s,-s,-s, 0,0), (-s, s, s, 1,1), (-s, s,-s, 0,1)]),
+        # Topo (+Y)
+        ((0,1,0),  [(-s, s, s, 0,0), ( s, s, s, 1,0), ( s, s,-s, 1,1), (-s, s, s, 0,0), ( s, s,-s, 1,1), (-s, s,-s, 0,1)]),
+        # Base (-Y)
+        ((0,-1,0), [(-s,-s,-s, 0,0), ( s,-s,-s, 1,0), ( s,-s, s, 1,1), (-s,-s,-s, 0,0), ( s,-s, s, 1,1), (-s,-s, s, 0,1)]),
     ]
     for n, vv in faces:
         for v in vv:
-            vs.append(v); ns.append(n); ts.append((v[0]+s, v[2]+s))
+            vs.append(v[:3])
+            ns.append(n)
+            ts.append((v[3], v[4]))
     return _mesh(vs, ns, ts)
 
 def make_plane(size=1.0):
